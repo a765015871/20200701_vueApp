@@ -40,7 +40,8 @@
               </section>
               <section class="login_message">
                 <input type="text" maxlength="11" placeholder="验证码" v-model="captcha">
-                <img class="get_verification" src="./images/captcha.svg" alt="captcha">
+                <img class="get_verification" :src="showCaptcha" alt="captcha"
+                     @click="captchaClick">
               </section>
             </section>
           </div>
@@ -58,6 +59,8 @@
 
 <script>
   import AlertTip from '../../components/AlertTip/AlertTip'
+  import {reqSmsLogin, reqSendCode, reqPwdLogin} from '../../api'
+
   export default {
     components: {
       AlertTip
@@ -73,7 +76,8 @@
         alertText: '',
         name: '',
         captcha: '',
-        code: ''
+        code: '',
+        showCaptcha: 'http://localhost:4000/captcha'
       }
     },
     computed: {
@@ -86,17 +90,34 @@
       }
     },
     methods: {
+      captchaClick () {
+        this.showCaptcha = 'http://localhost:4000/captcha?time='+Date.now()
+      },
       // 获取手机短信验证码
-      sendPhone () {
+      // var ACCOUNT_SID = '8a216da8730561fd01730ab55feb033b'
+      // var AUTH_TOKEN = '30d7f42f51944ca8be0a59f7d0329be8'
+      // var Rest_URL = 'https://app.cloopen.com:8883'
+      // var AppID = '8a216da8730561fd01730ab560da0342'
+     async sendPhone () {
         if (this.timeCount===0){
           this.timeCount = 30
-         const intervalID = setInterval(() => {
+         this.intervalId = setInterval(() => {
             this.timeCount--
             if (this.timeCount<=0){
-              clearInterval(intervalID)
+              clearInterval(this.intervalId)
             }
           },1000)
           // 发送获取验证码的请求
+          const result = await reqSendCode(this.phone)
+          if (this.timeCount){
+            this.timeCount = 0
+            clearInterval(this.intervalId)
+          }
+          if (result.code===0){ // 发送成功
+
+          }else {
+            this.showAlert(result.msg)
+          }
         }
       },
       submitClick () {
