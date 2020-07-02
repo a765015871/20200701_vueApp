@@ -1,13 +1,14 @@
 <template>
   <div class="msite">
     <!--首页头部-->
-    <HeaderTop :title="address.name">
-      <span class="header_search" slot="left">
+    <HeaderTop :title="address.name || '湖南省长沙市芙蓉区远大二路'">
+      <router-link class="header_search" slot="left" to="/search">
         <i class="iconfont icon-sousuo"></i>
-      </span>
-      <span class="header_login" slot="right">
-        <span class="header_login_text">登录|注册</span>
-       </span>
+      </router-link>
+      <router-link class="header_login" slot="right" :to="userInfo._id?'/userInfo':'/login'">
+        <span class="header_login_text" v-if="!userInfo._id">登录|注册</span>
+        <i class="iconfont icon-person" v-else ></i>
+       </router-link>
     </HeaderTop>
     <!--首页导航-->
     <nav class="msite_nav">
@@ -57,7 +58,8 @@
     computed: {
       ...mapState({
         address:state=>state.msiteTask.address,
-        categorys:state=>state.msiteTask.categorys
+        categorys:state=>state.msiteTask.categorys,
+        userInfo:state=>state.msiteTask.userInfo
       }),
       categorysArr () {
         const {categorys} = this
