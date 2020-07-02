@@ -40,7 +40,8 @@
               </section>
               <section class="login_message">
                 <input type="text" maxlength="11" placeholder="验证码" v-model="captcha">
-                <img class="get_verification" src="./images/captcha.svg" alt="captcha">
+                <img class="get_verification" src="http://localhost:4000/captcha" alt="captcha"
+                @click="getCaptcha" ref="captcha">
               </section>
             </section>
           </div>
@@ -64,7 +65,7 @@
     },
     data () {
       return {
-        loginState: true, // true: 为短信登陆 false: 为密码登陆
+        loginState: false, // true: 为短信登陆 false: 为密码登陆
         phone: '',
         timeCount: 0,
         showPwd: false,
@@ -86,6 +87,9 @@
       }
     },
     methods: {
+      getCaptcha () {
+        this.$refs.captcha.src = 'http://localhost:4000/captcha?time=' + Date.now()
+      },
       // 获取手机短信验证码
       sendPhone () {
         if (this.timeCount===0){
