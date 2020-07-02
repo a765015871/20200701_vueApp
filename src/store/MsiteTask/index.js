@@ -1,6 +1,8 @@
 
-import {reqAddress, reqShops, reqCategorys} from '../../api'
-import {RECEIVE_ADDRESS, RECEIVE_CATEGORYS, RECEIVE_SHOPS} from './mutation-type'
+import {reqAddress, reqShops, reqCategorys, reqUser} from '../../api'
+import {
+  RECEIVE_ADDRESS, RECEIVE_CATEGORYS, RECEIVE_SHOPS, RECEIVE_USER_INFO,
+} from './mutation-type'
 
 export default {
   state: {
@@ -12,8 +14,10 @@ export default {
     address: {},
     // 分类数组
     categorys: [],
-    //商家数组
+    // 商家数组
     shops: [],
+    // 登陆的用户信息
+    userInfo: {}
   },
   actions: {
     // 异步获取地址
@@ -41,6 +45,18 @@ export default {
         const shops = result.data
         commit(RECEIVE_SHOPS, {shops})
       }
+    },
+    // 同步登陆的用户信息
+    recordUser ({commit}, userInfo) {
+      commit(RECEIVE_USER_INFO, {userInfo})
+    },
+    // 获取用户信息
+    async getUserInfo ({commit}) {
+      const result = await reqUser()
+      if (result.code===0){
+        const userInfo = result.data
+        commit(RECEIVE_USER_INFO, {userInfo})
+      }
     }
   },
   mutations: {
@@ -52,6 +68,9 @@ export default {
     },
     [RECEIVE_SHOPS] (state, {shops}){
       state.shops = shops
+    },
+    [RECEIVE_USER_INFO] (state, {userInfo}){
+      state.userInfo = userInfo
     }
   },
   getters: {

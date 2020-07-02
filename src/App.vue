@@ -6,6 +6,7 @@
 </template>
 
 <script>
+  import {mapActions} from 'vuex'
   import FooterGuide from './components/FooterGuide/FooterGuide'
   export default {
     components: {
@@ -13,7 +14,13 @@
     },
     // 在App初始化的时候就应该获取地址
     created () {
-      this.$store.dispatch('getAddress')
+      // this.$store.dispatch('getAddress')
+      // this.$store.dispatch('getUserInfo')
+      this.getAddress()
+      this.getUserInfo()
+    },
+    methods: {
+      ...mapActions(['getAddress', 'getUserInfo'])
     }
   }
 </script>

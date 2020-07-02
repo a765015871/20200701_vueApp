@@ -40,8 +40,8 @@
               </section>
               <section class="login_message">
                 <input type="text" maxlength="11" placeholder="验证码" v-model="captcha">
-                <img class="get_verification" :src="showCaptcha" alt="captcha"
-                     @click="captchaClick">
+                <img class="get_verification" src="http://localhost:4000/captcha" alt="captcha"
+                @click="getCaptcha" ref="captcha">
               </section>
             </section>
           </div>
@@ -58,16 +58,15 @@
 </template>
 
 <script>
+  import {reqPwdLogin, reqSmsLogin, reqSendCode} from '../../api'
   import AlertTip from '../../components/AlertTip/AlertTip'
-  import {reqSmsLogin, reqSendCode, reqPwdLogin} from '../../api'
-
   export default {
     components: {
       AlertTip
     },
     data () {
       return {
-        loginState: true, // true: 为短信登陆 false: 为密码登陆
+        loginState: false, // true: 为短信登陆 false: 为密码登陆
         phone: '',
         timeCount: 0,
         showPwd: false,
@@ -76,8 +75,7 @@
         alertText: '',
         name: '',
         captcha: '',
-        code: '',
-        showCaptcha: 'http://localhost:4000/captcha'
+        code: ''
       }
     },
     computed: {
@@ -90,56 +88,74 @@
       }
     },
     methods: {
-      captchaClick () {
-        this.showCaptcha = 'http://localhost:4000/captcha?time='+Date.now()
+      getCaptcha () {
+        this.$refs.captcha.src = 'http://localhost:4000/captcha?time=' + Date.now()
       },
       // 获取手机短信验证码
-      // var ACCOUNT_SID = '8a216da8730561fd01730ab55feb033b'
-      // var AUTH_TOKEN = '30d7f42f51944ca8be0a59f7d0329be8'
-      // var Rest_URL = 'https://app.cloopen.com:8883'
-      // var AppID = '8a216da8730561fd01730ab560da0342'
-     async sendPhone () {
-        if (this.timeCount===0){
+      async sendPhone() {
+        if (this.timeCount === 0) {
           this.timeCount = 30
-         this.intervalId = setInterval(() => {
+          this.intervalId = setInterval(() => {
             this.timeCount--
-            if (this.timeCount<=0){
+            if (this.timeCount <= 0) {
               clearInterval(this.intervalId)
             }
-          },1000)
-          // 发送获取验证码的请求
+          }, 1000)
+          // 异步发送获取验证码的请求
+          // var ACCOUNT_SID = '8a216da8730561fd01730ab55feb033b';
+          // var AUTH_TOKEN = '30d7f42f51944ca8be0a59f7d0329be8';
+          // var Rest_URL = 'https://app.cloopen.com:8883';
+          // var AppID = '8a216da8730561fd01730ab560da0342';
           const result = await reqSendCode(this.phone)
           if (this.timeCount){
+            // 停止计时器
             this.timeCount = 0
             clearInterval(this.intervalId)
           }
-          if (result.code===0){ // 发送成功
-
-          }else {
+          if (result.code===1){ //失败
             this.showAlert(result.msg)
+          }else { //成功
+
           }
         }
       },
-      submitClick () {
+      async submitClick() {
+        let result
         const {phone, code} = this
         const {name, pwd, captcha} = this
-        if (this.loginState){ // 短信登陆
-          if (!/^1(3|4|5|6|7|8|9)\d{9}$/.test(phone)){
+        if (this.loginState) { // 短信登陆
+          if (!/^1(3|4|5|6|7|8|9)\d{9}$/.test(phone)) {
             // 手机号不正确
             this.showAlert('手机号不正确')
-          }else if (!/^\d{6}$/.test(code)){
+            return
+          } else if (!/^\d{6}$/.test(code)) {
             // 验证码必须是6位数字
             this.showAlert('验证码必须是6位数字')
+            return
           }
-        }else {
-          if (!name.length>0 || !pwd.length>0){
+          // 异步发送短信
+          result = await reqSmsLogin(phone, code)
+        } else {
+          if (!name.length > 0 || !pwd.length > 0) {
             // 用户名或密码不能为空
             this.showAlert('用户名或密码不能为空')
-          }else if (!/^\d{6}$/.test(captcha)){
-            // 验证码必须是6位数字
-            this.showAlert('验证码必须是6位数字')
+            return
+          } else if (captcha.length!=4) {
+            // 验证码必须是4位数字
+            this.showAlert('验证码必须是4位')
+            return
           }
+          result = await reqPwdLogin(name, pwd, captcha)
         }
+        if (result.code===0){
+          const userInfo = result.data
+          this.$store.dispatch('recordUser', userInfo)
+          this.$router.replace('/porfile')
+        }else {
+          this.getCaptcha()
+          this.showAlert(result.msg)
+        }
+
       },
       closeTip () {
         this.alertShow = false
