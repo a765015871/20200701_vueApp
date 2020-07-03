@@ -4,6 +4,7 @@
     </HeaderTop>
     <form class="search_form" action="#">
       <input type="search" name="search" placeholder="请输入商家或美食名称" class="search_input">
+
       <input type="submit" name="submit" class="search_submit">
     </form>
   </div>
@@ -21,6 +22,7 @@
 <style lang="stylus" ref="stylesheet/stylus">
   @import "../../common/stylus/mixins.styl"
   .search  //搜索
+    overflow hidden
     .header
       background-color #02a774
       position fixed

@@ -4,17 +4,23 @@
       </HeaderTop>
       <section class="order_no_login">
         <img src="./images/person.png">
-        <h3>登录后查看外卖订单</h3>
-        <button>立即登陆</button>
+        <h3>{{userInfo._id?'暂无订单':'登录后查看外卖订单'}}</h3>
+        <button v-if="!userInfo._id">立即登陆</button>
       </section>
     </div>
 </template>
 
 <script>
   import HeaderTop from '../../components/HeaderTop/HeaderTop'
+  import {mapState} from 'vuex'
   export default {
     components: {
       HeaderTop
+    },
+    computed: {
+      ...mapState({
+        userInfo:state=>state.msiteTask.userInfo
+      })
     }
   }
 </script>

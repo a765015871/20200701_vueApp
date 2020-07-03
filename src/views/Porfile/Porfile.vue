@@ -89,11 +89,15 @@
         </div>
       </a>
     </section>
+    <section class="profile_my_order border-1px" v-if="userInfo._id">
+      <van-button type="danger" style="width: 100%" @click="logoutClick">退出登陆</van-button>
+    </section>
   </div>
 </template>
 
 <script>
-  import {mapState} from 'vuex'
+  import {mapState, mapActions} from 'vuex'
+  import {Dialog, Toast} from 'vant'
   import HeaderTop from '../../components/HeaderTop/HeaderTop'
   export default {
     components: {
@@ -103,6 +107,20 @@
       ...mapState({
         userInfo:state=>state.msiteTask.userInfo
       })
+    },
+    methods: {
+      ...mapActions(['logout']),
+      logoutClick () {
+        Dialog.confirm({
+          title: '提示',
+          message: '是否确认退出登陆?'
+        }).then(() => {
+          this.logout()
+          Toast('登出成功')
+        }).catch(() => {
+          console.log('取消退出')
+        })
+      }
     }
   }
 </script>

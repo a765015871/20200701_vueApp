@@ -7,6 +7,11 @@ import Search from '../views/Search/Search'
 import Order from '../views/Order/Order'
 import Porfile from '../views/Porfile/Porfile'
 import Login from '../views/Login/Login'
+import Shop from '../views/Msite/Shop/Shop'
+import ShopGoods from '../views/Msite/Shop/ShopGoods/ShopGoods'
+import ShopPingjia from '../views/Msite/Shop/ShopPingjia/ShopPingjia'
+import ShopInfo from '../views/Msite/Shop/ShopInfo/ShopInfo'
+
 Vue.use(VueRouter)
 
 export default new VueRouter({
@@ -46,6 +51,28 @@ export default new VueRouter({
     {
       path: '/login',
       component: Login
-    }
+    },
+    {
+      path: '/shop',
+      component: Shop,
+      children: [
+        {
+          path: '/shop/goods',
+          component: ShopGoods
+        },
+        {
+          path: '/shop/pingjia',
+          component: ShopPingjia
+        },
+        {
+          path: '/shop/info',
+          component: ShopInfo
+        },
+        {
+          path: '',
+          redirect: '/shop/goods'
+        },
+      ]
+    },
   ]
 })
