@@ -9,7 +9,7 @@ import Porfile from '../views/Porfile/Porfile'
 import Login from '../views/Login/Login'
 import Shop from '../views/Msite/Shop/Shop'
 import ShopGoods from '../views/Msite/Shop/ShopGoods/ShopGoods'
-import ShopPingjia from '../views/Msite/Shop/ShopPingjia/ShopPingjia'
+import ShopRatings from '../views/Msite/Shop/ShopRatings/ShopRatings'
 import ShopInfo from '../views/Msite/Shop/ShopInfo/ShopInfo'
 
 Vue.use(VueRouter)
@@ -61,8 +61,8 @@ export default new VueRouter({
           component: ShopGoods
         },
         {
-          path: '/shop/pingjia',
-          component: ShopPingjia
+          path: '/shop/ratings',
+          component: ShopRatings
         },
         {
           path: '/shop/info',
