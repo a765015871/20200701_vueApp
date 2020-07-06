@@ -1,7 +1,13 @@
 
-import {reqAddress, reqShops, reqCategorys, reqUser} from '../../api'
 import {
-  RECEIVE_ADDRESS, RECEIVE_CATEGORYS, RECEIVE_SHOPS, RECEIVE_USER_INFO,
+  reqAddress, reqShops, reqCategorys,
+  reqUser, reqLogout, reqShopInfo,
+  reqShopRatings, reqShopGoods
+} from '../../api'
+import {
+  RECEIVE_ADDRESS, RECEIVE_CATEGORYS, RECEIVE_SHOPS,
+  RECEIVE_USER_INFO, RESET_USER_INFO, RECEIVE_GOODS,
+  RECEIVE_INFO, RECEIVE_RATINGS
 } from './mutation-type'
 
 export default {
@@ -17,7 +23,17 @@ export default {
     // 商家数组
     shops: [],
     // 登陆的用户信息
-    userInfo: {}
+    userInfo: {},
+    // 商品列表
+    goods: [],
+    // 商家评价列表
+    ratings: [],
+    // 商家信息
+    info: {},
+    // 购物车中食物的列表
+    cartFoods: [],
+    // 搜索得到的商家列表
+    searchShops: [],
   },
   actions: {
     // 异步获取地址
@@ -57,7 +73,41 @@ export default {
         const userInfo = result.data
         commit(RECEIVE_USER_INFO, {userInfo})
       }
-    }
+    },
+    async logout ({commit}) {
+      const result = await reqLogout()
+      if (result.code===0){
+        commit(RESET_USER_INFO)
+      }
+    },
+    // 异步获取商家信息
+    async getShopInfo({commit}) {
+      const result = await reqShopInfo()
+      if (result.code === 0) {
+        const info = result.data
+        commit(RECEIVE_INFO, {info})
+      }
+    },
+    // 异步获取商家评价列表
+    async getShopRatings({commit}, callback) {
+      const result = await reqShopRatings()
+      if (result.code === 0) {
+        const ratings = result.data
+        commit(RECEIVE_RATINGS, {ratings})
+        // 数据更新了, 通知一下组件
+        callback && callback()
+      }
+    },
+    // 异步获取商家商品列表
+    async getShopGoods({commit}, callback) {
+      const result = await reqShopGoods()
+      if (result.code === 0) {
+        const goods = result.data
+        commit(RECEIVE_GOODS, {goods})
+        // 数据更新了, 通知一下组件
+        callback && callback()
+      }
+    },
   },
   mutations: {
     [RECEIVE_ADDRESS] (state, {address}){
@@ -71,7 +121,21 @@ export default {
     },
     [RECEIVE_USER_INFO] (state, {userInfo}){
       state.userInfo = userInfo
-    }
+    },
+    [RESET_USER_INFO] (state) {
+      state.userInfo = {}
+    },
+    [RECEIVE_INFO](state, {info}) {
+      state.info = info
+    },
+
+    [RECEIVE_RATINGS](state, {ratings}) {
+      state.ratings = ratings
+    },
+
+    [RECEIVE_GOODS](state, {goods}) {
+      state.goods = goods
+    },
   },
   getters: {
 

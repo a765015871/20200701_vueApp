@@ -40,7 +40,7 @@
               </section>
               <section class="login_message">
                 <input type="text" maxlength="11" placeholder="验证码" v-model="captcha">
-                <img class="get_verification" src="http://localhost:4000/captcha" alt="captcha"
+                <img class="get_verification" :src="captchaImg" alt="captcha"
                 @click="getCaptcha" ref="captcha">
               </section>
             </section>
@@ -60,6 +60,7 @@
 <script>
   import {reqPwdLogin, reqSmsLogin, reqSendCode} from '../../api'
   import AlertTip from '../../components/AlertTip/AlertTip'
+  import {Toast} from 'vant'
   export default {
     components: {
       AlertTip
@@ -85,6 +86,9 @@
         }else {
           return /^1(3|4|5|6|7|8|9)\d{9}$/.test(this.phone)
         }
+      },
+      captchaImg () {
+        return 'http://localhost:4000/captcha?time=' + Date.now()
       }
     },
     methods: {
@@ -107,19 +111,18 @@
           // var Rest_URL = 'https://app.cloopen.com:8883';
           // var AppID = '8a216da8730561fd01730ab560da0342';
           const result = await reqSendCode(this.phone)
-          if (this.timeCount){
-            // 停止计时器
-            this.timeCount = 0
-            clearInterval(this.intervalId)
-          }
+
           if (result.code===1){ //失败
             this.showAlert(result.msg)
-          }else { //成功
-
+            if (this.timeCount){ //发送失败停止计时器
+              this.timeCount = 0
+              clearInterval(this.intervalId)
+            }
           }
         }
       },
       async submitClick() {
+
         let result
         const {phone, code} = this
         const {name, pwd, captcha} = this
@@ -133,7 +136,12 @@
             this.showAlert('验证码必须是6位数字')
             return
           }
-          // 异步发送短信
+          Toast.loading({
+            duration: 0, // 持续展示 toast
+            message: '登陆中...',
+            forbidClick: true,
+          })
+          // 短信登陆
           result = await reqSmsLogin(phone, code)
         } else {
           if (!name.length > 0 || !pwd.length > 0) {
@@ -145,14 +153,20 @@
             this.showAlert('验证码必须是4位')
             return
           }
+          Toast.loading({
+            duration: 0, // 持续展示 toast
+            message: '登陆中...',
+            forbidClick: true,
+          })
           result = await reqPwdLogin(name, pwd, captcha)
         }
-        if (result.code===0){
+        Toast.clear()
+        if (result.code===0){ //成功
           const userInfo = result.data
           this.$store.dispatch('recordUser', userInfo)
           this.$router.replace('/porfile')
         }else {
-          this.getCaptcha()
+          this.getCaptcha() // 更变图片验证码
           this.showAlert(result.msg)
         }
 
