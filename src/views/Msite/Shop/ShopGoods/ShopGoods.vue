@@ -4,7 +4,7 @@
       <div class="menu-wrapper">
         <ul>
 <!--           current-->
-          <li class="menu-item" v-for="(good, index) in goods" :key="index">
+          <li class="menu-item" :class="{current: currentIndex(index)}" v-for="(good, index) in goods" :key="index">
             <span class="text bottom-border-1px">
             <img class="icon" :src="good.icon" v-if="good.icon">
               {{good.name}}
@@ -13,10 +13,10 @@
         </ul>
       </div>
       <div class="foods-wrapper">
-        <ul>
+        <ul ref="foodScroll">
           <li class="food-list food-list-hook" v-for="(good, index) in goods" :key="index">
             <h1 class="title">{{good.name}}</h1>
-            <ul>
+            <ul >
               <li class="food-item bottom-border-1px" v-for="(food, index) in good.foods" :key="index">
                 <div class="icon">
                   <img width="57" height="57" :src="food.icon">
@@ -47,7 +47,19 @@
   import {mapState} from 'vuex'
   import BScroll from 'better-scroll'
   export default {
+    data () {
+      return {
+        tops: [],
+        scrollY: 0
+      }
+    },
     computed: {
+      currentIndex () {
+        return (index) => {
+          // console.log(index)
+          return false
+        }
+      },
       ...mapState({
         goods:state=>state.msiteTask.goods
       })
@@ -55,10 +67,45 @@
     created() {
       this.$store.dispatch('getShopGoods', () => {
         this.$nextTick(() => {
-          new BScroll('.menu-wrapper')
-          new BScroll('.foods-wrapper')
+          this._initGoodsScroll()
+          this._initTopsScroll()
         })
       })
+    },
+    methods: {
+      _initGoodsScroll () {
+        new BScroll('.menu-wrapper')
+        const foodScroll = new BScroll('.foods-wrapper', {
+          probeType: 2
+        })
+        foodScroll.on('scroll', ({x, y}) => {
+          console.log(x,y)
+          this.scrollY = y
+        })
+      },
+      _initTopsScroll () {
+        const tops = []
+        let top = 0
+        tops.push(top)
+         const lis = this.$refs.foodScroll.children
+
+        // Array.prototype.slice.call(lis).forEach(li => {
+        //   top += li.clientHeight
+        //   tops.push(top)
+        // })
+        for (const lisKey in lis) {
+          const li = lis[lisKey]
+          if (li){
+            top += li.clientHeight
+          }
+          tops.push(top)
+        }
+        // 3. 更新数据
+        this.tops = tops
+        console.log(tops)
+
+
+      }
     }
   }
 </script>
