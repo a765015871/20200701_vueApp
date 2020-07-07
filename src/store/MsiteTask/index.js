@@ -7,9 +7,10 @@ import {
 import {
   RECEIVE_ADDRESS, RECEIVE_CATEGORYS, RECEIVE_SHOPS,
   RECEIVE_USER_INFO, RESET_USER_INFO, RECEIVE_GOODS,
-  RECEIVE_INFO, RECEIVE_RATINGS
+  RECEIVE_INFO, RECEIVE_RATINGS, DECREMENT_FOOD_COUNT,
+  INCREMENT_FOOD_COUNT
 } from './mutation-type'
-
+import Vue from 'vue'
 export default {
   state: {
     // 纬度
@@ -34,6 +35,8 @@ export default {
     cartFoods: [],
     // 搜索得到的商家列表
     searchShops: [],
+    // 购物车
+    shopCart: []
   },
   actions: {
     // 异步获取地址
@@ -108,6 +111,14 @@ export default {
         callback && callback()
       }
     },
+    // 同步更新购物车食物的添加减少
+    updateFoodCount ({commit}, {food, isAdd}){
+      if (isAdd){
+        commit(INCREMENT_FOOD_COUNT, {food})
+      }else {
+        commit(DECREMENT_FOOD_COUNT, {food})
+      }
+    }
   },
   mutations: {
     [RECEIVE_ADDRESS] (state, {address}){
@@ -128,13 +139,23 @@ export default {
     [RECEIVE_INFO](state, {info}) {
       state.info = info
     },
-
     [RECEIVE_RATINGS](state, {ratings}) {
       state.ratings = ratings
     },
-
     [RECEIVE_GOODS](state, {goods}) {
       state.goods = goods
+    },
+    [INCREMENT_FOOD_COUNT] (state, {food}){
+      if (!food.count){
+        Vue.set(food, 'count', 1)
+      }else {
+        food.count++
+      }
+    },
+    [DECREMENT_FOOD_COUNT] (state, {food}){
+      if (food.count){
+        food.count--
+      }
     },
   },
   getters: {
