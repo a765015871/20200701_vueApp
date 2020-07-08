@@ -148,6 +148,7 @@ export default {
     [INCREMENT_FOOD_COUNT] (state, {food}){
       if (!food.count){
         Vue.set(food, 'count', 1)
+        state.shopCart.push(food)
       }else {
         food.count++
       }
@@ -156,9 +157,22 @@ export default {
       if (food.count){
         food.count--
       }
+      if (food.count===0){
+        const index = state.shopCart.indexOf(food)
+        state.shopCart.splice(index, 1)
+      }
     },
   },
   getters: {
-
+    totalCount (state) {
+      return state.shopCart.reduce((preTotal, food) => {
+        return preTotal + food.count
+      }, 0)
+    },
+    totalPrice (state) {
+      return state.shopCart.reduce((preTotal, food) => {
+        return preTotal + food.count*food.price
+      }, 0)
+    }
   }
 }

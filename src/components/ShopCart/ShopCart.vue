@@ -2,42 +2,89 @@
   <div>
     <div class="shopcart">
       <div class="content">
-        <div class="content-left">
+        <div class="content-left" @click="viewClick">
           <div class="logo-wrapper">
-            <div class="logo highlight"><i class="iconfont icon-shopping_cart highlight"></i></div>
-            <div class="num">1</div>
+            <div class="logo" :class="{highlight: totalCount>0}">
+              <i class="iconfont icon-shopping_cart" :class="{highlight: totalCount>0}"></i>
+            </div>
+            <div class="num" v-show="totalCount">{{totalCount}}</div>
           </div>
-          <div class="price highlight">￥10</div>
-          <div class="desc">另需配送费￥4 元</div>
+          <div class="price" :class="{highlight: totalCount>0}">￥{{totalPrice}}</div>
+          <div class="desc">另需配送费￥{{info.deliveryPrice}} 元</div>
         </div>
         <div class="content-right">
-          <div class="pay not-enough"> 还差￥10 元起送</div>
+          <div class="pay" :class="info.minPrice>totalPrice?'not-enough':'enough'">
+            {{payText}}
+          </div>
         </div>
       </div>
-      <div class="shopcart-list" style="display: none;">
-        <div class="list-header"><h1 class="title">购物车</h1> <span class="empty">清空</span></div>
+      <div class="shopcart-list" v-show="listShow">
+        <div class="list-header">
+          <h1 class="title">购物车</h1>
+          <span class="empty">清空</span>
+        </div>
         <div class="list-content">
           <ul>
-            <li class="food"><span class="name">红枣山药糙米粥</span>
-              <div class="price"><span>￥10</span></div>
+            <li class="food" v-for="(food, index) in shopCart" :key="index">
+              <span class="name">{{food.name}}</span>
+              <div class="price"><span>￥{{food.price}}</span></div>
               <div class="cartcontrol-wrapper">
-                <div class="cartcontrol">
-                  <div class="iconfont icon-remove_circle_outline"></div>
-                  <div class="cart-count">1</div>
-                  <div class="iconfont icon-add_circle"></div>
-                </div>
+                <CartControl :food="food"/>
               </div>
             </li>
           </ul>
         </div>
       </div>
     </div>
-    <div class="list-mask" style="display: none;"></div>
+    <div class="list-mask" v-show="listShow" @click="viewClick"></div>
   </div>
 </template>
 
 <script>
-  export default {}
+  import {mapState,mapGetters} from 'vuex'
+  import CartControl from '../CartControl/CartControl'
+  export default {
+    data () {
+      return {
+        isShow: false
+      }
+    },
+    computed: {
+      ...mapState({
+        info:state=>state.msiteTask.info,
+        shopCart:state=>state.msiteTask.shopCart
+      }),
+      ...mapGetters(['totalCount', 'totalPrice']),
+      payText () {
+        const {totalPrice} = this
+        const {minPrice} = this.info
+        if (totalPrice===0){
+          return `￥${minPrice} 元起送`
+        }else if (minPrice>totalPrice){
+          return `还差￥${minPrice-totalPrice} 元起送`
+        }else {
+          return '去结算'
+        }
+      },
+      listShow () {
+        if (this.totalCount===0){
+          this.isShow = false
+          return false
+        }
+        return this.isShow
+      }
+    },
+    methods: {
+      viewClick () {
+        if (this.totalCount>0){
+          this.isShow = !this.isShow
+        }
+      }
+    },
+    components: {
+      CartControl
+    }
+  }
 </script>
 
 <style lang="stylus" ref="stylesheet/stylus">

@@ -22,35 +22,35 @@ export default new VueRouter({
     },
     {
       path: '/msite',
-      component: Msite,
+      component: () => import('../views/Msite/Msite'),
       meta: {
         showFooter: true
       }
     },
     {
       path: '/search',
-      component: Search,
+      component: () => import('../views/Search/Search'),
       meta: {
         showFooter: true
       }
     },
     {
       path: '/order',
-      component: Order,
+      component: () => import('../views/Order/Order'),
       meta: {
         showFooter: true
       }
     },
     {
       path: '/porfile',
-      component: Porfile,
+      component: () => import('../views/Porfile/Porfile'),
       meta: {
         showFooter: true
       }
     },
     {
       path: '/login',
-      component: Login
+      component: () => import('../views/Login/Login')
     },
     {
       path: '/shop',
