@@ -18,31 +18,39 @@
           </div>
         </div>
       </div>
-      <div class="shopcart-list" v-show="listShow">
-        <div class="list-header">
-          <h1 class="title">购物车</h1>
-          <span class="empty">清空</span>
+      <transition name="move">
+        <div class="shopcart-list" v-show="listShow">
+          <div class="list-header">
+            <h1 class="title">购物车</h1>
+            <span class="empty" @click="emptyClick">清空</span>
+          </div>
+          <div class="list-content">
+            <ul>
+              <li class="food" v-for="(food, index) in shopCart" :key="index">
+                <span class="name">{{food.name}}</span>
+                <div class="price"><span>￥{{food.price}}</span></div>
+                <div class="cartcontrol-wrapper">
+                  <CartControl :food="food"/>
+                </div>
+              </li>
+            </ul>
+          </div>
         </div>
-        <div class="list-content">
-          <ul>
-            <li class="food" v-for="(food, index) in shopCart" :key="index">
-              <span class="name">{{food.name}}</span>
-              <div class="price"><span>￥{{food.price}}</span></div>
-              <div class="cartcontrol-wrapper">
-                <CartControl :food="food"/>
-              </div>
-            </li>
-          </ul>
-        </div>
-      </div>
+      </transition>
+
     </div>
-    <div class="list-mask" v-show="listShow" @click="viewClick"></div>
+    <transition name="fade">
+      <div class="list-mask" v-show="listShow" @click="viewClick"></div>
+    </transition>
+
   </div>
 </template>
 
 <script>
   import {mapState,mapGetters} from 'vuex'
   import CartControl from '../CartControl/CartControl'
+  import BScroll from 'better-scroll'
+  import {Dialog} from 'vant'
   export default {
     data () {
       return {
@@ -71,6 +79,15 @@
           this.isShow = false
           return false
         }
+        if (this.totalCount>0){
+          this.$nextTick(() => {
+            if (!this.scroll){
+              this.scroll = new BScroll('.list-content')
+            }else {
+              this.scroll.refresh()
+            }
+          })
+        }
         return this.isShow
       }
     },
@@ -79,6 +96,16 @@
         if (this.totalCount>0){
           this.isShow = !this.isShow
         }
+      },
+      emptyClick () {
+        Dialog.confirm({
+          title: '提示',
+          message: '是否清空购物车?'
+        }).then(() => {
+          this.$store.dispatch('emptyClick')
+        }).catch(() => {
+          console.log('取消')
+        })
       }
     },
     components: {
@@ -198,7 +225,7 @@
       width 100%
       transform translateY(-100%)
       &.move-enter-active, &.move-leave-active
-        transition transform .3s
+        transition transform .5s
       &.move-enter, &.move-leave-to
         transform translateY(0)
       .list-header

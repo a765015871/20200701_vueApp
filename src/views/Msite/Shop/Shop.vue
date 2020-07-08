@@ -9,7 +9,10 @@
         <van-tab title="商家" to="/shop/info" replace>
         </van-tab>
       </van-tabs>
-      <router-view/>
+      <keep-alive>
+        <router-view/>
+      </keep-alive>
+
     </div>
 </template>
 

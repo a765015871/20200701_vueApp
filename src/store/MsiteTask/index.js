@@ -8,7 +8,7 @@ import {
   RECEIVE_ADDRESS, RECEIVE_CATEGORYS, RECEIVE_SHOPS,
   RECEIVE_USER_INFO, RESET_USER_INFO, RECEIVE_GOODS,
   RECEIVE_INFO, RECEIVE_RATINGS, DECREMENT_FOOD_COUNT,
-  INCREMENT_FOOD_COUNT
+  INCREMENT_FOOD_COUNT, EMTPY_CART
 } from './mutation-type'
 import Vue from 'vue'
 export default {
@@ -118,6 +118,10 @@ export default {
       }else {
         commit(DECREMENT_FOOD_COUNT, {food})
       }
+    },
+    // 同步清空购物车
+    emptyClick ({commit}){
+      commit(EMTPY_CART)
     }
   },
   mutations: {
@@ -162,6 +166,12 @@ export default {
         state.shopCart.splice(index, 1)
       }
     },
+    [EMTPY_CART] (state) {
+      state.shopCart.forEach(food => {
+        food.count = 0
+      })
+      state.shopCart = []
+    }
   },
   getters: {
     totalCount (state) {
