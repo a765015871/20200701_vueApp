@@ -11,30 +11,32 @@
        </router-link>
     </HeaderTop>
     <div class="miste-content-wrapper" ref="msites">
-      <!--首页导航-->
-      <nav class="msite_nav">
-        <div class="swiper-container">
-          <div class="swiper-wrapper">
-            <div class="swiper-slide" v-for="(categorys, index) in categorysArr" :key="index">
-              <a href="javascript:" class="link_to_food" v-for="(category, index) in categorys" :key="index">
-                <div class="food_container">
-                  <img :src="baseImgUrl+category.image_url">
-                </div>
-                <span>{{category.title}}</span>
-              </a>
+      <div class="miste-content">
+        <!--首页导航-->
+        <nav class="msite_nav">
+          <div class="swiper-container">
+            <div class="swiper-wrapper">
+              <div class="swiper-slide" v-for="(categorys, index) in categorysArr" :key="index">
+                <a href="javascript:" class="link_to_food" v-for="(category, index) in categorys" :key="index">
+                  <div class="food_container">
+                    <img :src="baseImgUrl+category.image_url">
+                  </div>
+                  <span>{{category.title}}</span>
+                </a>
+              </div>
             </div>
+            <!-- Add Pagination -->
+            <div class="swiper-pagination"></div>
           </div>
-          <!-- Add Pagination -->
-          <div class="swiper-pagination"></div>
+        </nav>
+        <!--首页附近商家-->
+        <div class="msite_shop_list">
+          <div class="shop_header">
+            <i class="iconfont icon-xuanxiang"></i>
+            <span class="shop_header_title">附近商家</span>
+          </div>
+          <ShopList/>
         </div>
-      </nav>
-      <!--首页附近商家-->
-      <div class="msite_shop_list">
-        <div class="shop_header">
-          <i class="iconfont icon-xuanxiang"></i>
-          <span class="shop_header_title">附近商家</span>
-        </div>
-        <ShopList/>
       </div>
     </div>
 
@@ -45,7 +47,7 @@
   import Swiper from 'swiper'
   import 'swiper/css/swiper.min.css'
   import {mapState, mapActions} from 'vuex'
-
+  import BScroll from 'better-scroll'
   import HeaderTop from '../../components/HeaderTop/HeaderTop'
   import ShopList from '../../components/ShopList/ShopList'
   export default {
@@ -98,7 +100,11 @@
     },
     mounted () {
       this.getCategorys()
-      this.getShops()
+      this.getShops(() => {
+        this.$nextTick(() => {
+          new BScroll('.miste-content-wrapper')
+        })
+      })
     }
   }
 </script>
@@ -114,7 +120,7 @@
       width: 100%
       .msite_nav
         bottom-border-1px(#e4e4e4)
-        margin-top 45px
+        margin-top 15px
         height 200px
         background #fff
         .swiper-container

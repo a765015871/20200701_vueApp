@@ -56,7 +56,9 @@
           </span>
           </div>
         </div>
-        <div class="brief-modal-cover"></div>
+        <transition name="fade">
+          <div class="brief-modal-cover"></div>
+        </transition>
       </div >
     </transition>
     <transition name="supprtfade">
@@ -75,7 +77,10 @@
            </span>
           </div>
         </div>
-        <div class="activity-sheet-cover"></div>
+        <transition name="fade">
+          <div class="activity-sheet-cover"></div>
+        </transition>
+
       </div>
     </transition>
 
@@ -302,7 +307,10 @@
         left 0
         background-color rgba(0, 0, 0, .5)
         z-index 1
-
+        &.fade-enter-active,&.fade-leave-avtive
+          transition opacity 0.5s
+        &.fade-enter,&.fade-leave-to
+          opacity 0
       .brief-modal-content
         position relative
         width 80%
@@ -473,4 +481,8 @@
         top 0
         left 0
         background-color rgba(0, 0, 0, .5)
+        &.fade-enter-active,&.fade-leave-avtive
+          transition opacity 0.5s
+        &.fade-enter,&.fade-leave-to
+          opacity 0
 </style>

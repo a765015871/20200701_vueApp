@@ -3,72 +3,84 @@
     <div class="ratings-content">
       <div class="overview">
         <div class="overview-left">
-          <h1 class="score">4.7</h1>
+          <h1 class="score">{{info.score}}</h1>
           <div class="title">综合评分</div>
-          <div class="rank">高于周边商家99%</div>
+          <div class="rank">高于周边商家{{info.rankRate}}%</div>
         </div>
         <div class="overview-right">
           <div class="score-wrapper">
-            <Star :score="4.6" :size="36"/>
+            <Star :score="info.serviceScore" :size="36"/>
             <span class="title">服务态度</span>
-            <span class="score">4.6</span>
+            <span class="score">{{info.serviceScore}}</span>
           </div>
           <div class="score-wrapper">
 
-            <Star :score="4.7" :size="36"/>
+            <Star :score="info.foodScore" :size="36"/>
             <span class="title">商品评分</span>
-            <span class="score">4.7</span>
+            <span class="score">{{info.foodScore}}</span>
           </div>
           <div class="delivery-wrapper">
             <span class="title">送达时间</span>
-            <span class="delivery">30 分钟</span>
+            <span class="delivery">{{info.deliveryTime}} 分钟</span>
           </div>
         </div>
       </div>
       <Split/>
       <div class="ratingselect">
-        <div class="rating-type border-1px"><span class="block positive active"> 全部<span class="count">30</span> </span>
-          <span class="block positive"> 满意<span class="count">28</span> </span> <span class="block negative"> 不满意<span
-            class="count">2</span> </span></div>
-        <div class="switch on"><span class="iconfont icon-check_circle"></span> <span class="text">只看有内容的评价</span></div>
+        <div class="rating-type border-1px">
+          <span class="block positive" :class="{active: rateType===2}" @click="rateType=2">
+            全部<span class="count">{{ratings.length}}</span>
+          </span>
+          <span class="block positive" :class="{active: rateType===0}" @click="rateType=0">
+            满意<span class="count">{{positiveCount}}</span>
+          </span>
+          <span class="block negative" :class="{active: rateType===1}" @click="rateType=1">
+          不满意<span class="count">{{ratings.length-positiveCount}}</span> </span>
+        </div>
+        <div class="switch" :class="{on: isRatingShow}" @click="isRatingShow=!isRatingShow">
+          <span class="iconfont icon-check_circle"></span>
+          <span class="text">只看有内容的评价</span>
+        </div>
       </div>
       <div class="rating-wrapper">
         <ul>
-          <li class="rating-item">
+          <li class="rating-item" v-for="(rating, index) in tempRatings" :key="index">
             <div class="avatar">
-              <img width="28" height="28" src="http://static.galileo.xiaojukeji.com/static/tms/default_header.png">
+              <img width="28" height="28" :src="rating.avatar">
             </div>
             <div class="content">
-              <h1 class="name">aa</h1>
+              <h1 class="name">{{rating.username}}</h1>
               <div class="star-wrapper">
-                <Star :score="5" :size="24"/>
-                <span class="delivery">30</span>
+                <Star :score="rating.score" :size="24"/>
+                <span class="delivery">{{rating.deliveryTime || '&nbsp;'}}</span>
               </div>
-              <p class="text">不错</p>
+              <p class="text">{{rating.text}}</p>
               <div class="recommend">
                 <span class="iconfont icon-thumb_up"></span>
-                <span class="item">南瓜粥</span>
-                <span class="item">皮蛋瘦肉粥</span>
-                <span class="item">扁豆焖面</span>
+                <span class="item" v-for="(foodName,index) in rating.recommend"
+                :key="index">{{foodName}}</span>
               </div>
-              <div class="time">2016-07-23 21:52:44</div>
+              <div class="time">{{rating.rateTime}}</div>
             </div>
           </li>
         </ul>
       </div>
     </div>
   </div>
-
-
-
 </template>
 
 <script>
   import Split from '../../../../components/Split/Split'
   import Star from '../../../../components/Star/Star'
   import BScroll from 'better-scroll'
-  import {mapState} from 'vuex'
+  import {mapState, mapGetters} from 'vuex'
   export default {
+    data () {
+      return {
+        rateType: 2, // 0: 为满意 1:不满意 2: 全部、
+        isRatingShow: true // 是否只看有评论的
+      }
+    },
     components: {
       Split,
       Star
@@ -77,7 +89,25 @@
       ...mapState({
         info:state=>state.msiteTask.info,
         ratings:state=>state.msiteTask.ratings
-      })
+      }),
+      ...mapGetters(['positiveCount']),
+      tempRatings () {
+        if (!this.ratings){
+          return []
+        }
+        const {ratings, rateType, isRatingShow} = this
+
+        return ratings.filter(rating => {
+          let isType = true
+          if (rateType===0){
+            isType = rating.rateType===0
+          }else if (rateType==1){
+            isType = rating.rateType===1
+          }
+          const isShow = !isRatingShow || rating.text.length>0
+          return isType && isShow
+        })
+      }
     },
     mounted() {
       this.$store.dispatch('getShopRatings', () => {

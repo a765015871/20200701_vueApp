@@ -57,12 +57,14 @@ export default {
       }
     },
     // 异步获取商家列表
-    async getShops ({commit, state}) {
+    async getShops ({commit, state}, callback) {
       const {latitude, longitude} = state
       const result = await reqShops({latitude, longitude})
       if (result.code===0){
         const shops = result.data
         commit(RECEIVE_SHOPS, {shops})
+        // 数据更新了, 通知一下组件
+        callback && callback()
       }
     },
     // 同步登陆的用户信息
@@ -182,6 +184,11 @@ export default {
     totalPrice (state) {
       return state.shopCart.reduce((preTotal, food) => {
         return preTotal + food.count*food.price
+      }, 0)
+    },
+    positiveCount (state) {
+      return state.ratings.reduce((preTotal, rating) => {
+        return preTotal + (rating.rateType===0?1:0)
       }, 0)
     }
   }
