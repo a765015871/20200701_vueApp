@@ -13,7 +13,7 @@
           </li>
         </ul>
       </div>
-      <div class="foods-wrapper">
+      <div class="foods-wrapper" ref="foodsScroll">
         <ul ref="foodScroll">
           <li class="food-list food-list-hook" v-for="(good, index) in goods" :key="index">
             <h1 class="title">{{good.name}}</h1>
@@ -61,7 +61,7 @@
         food: {}
       }
     },
-    created() {
+    mounted() {
       this.$store.dispatch('getShopGoods', () => {
         this.$nextTick(() => {
           this._initGoodsScroll()
@@ -92,7 +92,7 @@
     methods: {
       _initGoodsScroll () {
         new BScroll('.menu-wrapper')
-        this.foodScroll = new BScroll('.foods-wrapper', {
+        this.foodScroll = new BScroll(this.$refs.foodsScroll, {
           probeType: 2
         })
         this.foodScroll.on('scroll', ({x, y}) => {

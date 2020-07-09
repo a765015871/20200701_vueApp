@@ -2,15 +2,6 @@
 
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Msite from '../views/Msite/Msite'
-import Search from '../views/Search/Search'
-import Order from '../views/Order/Order'
-import Porfile from '../views/Porfile/Porfile'
-import Login from '../views/Login/Login'
-import Shop from '../views/Msite/Shop/Shop'
-import ShopGoods from '../views/Msite/Shop/ShopGoods/ShopGoods'
-import ShopRatings from '../views/Msite/Shop/ShopRatings/ShopRatings'
-import ShopInfo from '../views/Msite/Shop/ShopInfo/ShopInfo'
 
 Vue.use(VueRouter)
 
@@ -54,19 +45,19 @@ export default new VueRouter({
     },
     {
       path: '/shop',
-      component: Shop,
+      component: () => import('../views/Msite/Shop/Shop'),
       children: [
         {
           path: '/shop/goods',
-          component: ShopGoods
+          component: () => import('../views/Msite/Shop/ShopGoods/ShopGoods')
         },
         {
           path: '/shop/ratings',
-          component: ShopRatings
+          component: () => import('../views/Msite/Shop/ShopRatings/ShopRatings')
         },
         {
           path: '/shop/info',
-          component: ShopInfo
+          component: () => import('../views/Msite/Shop/ShopInfo/ShopInfo')
         },
         {
           path: '',

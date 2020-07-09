@@ -68,6 +68,7 @@
 <style lang="stylus" ref="stylesheet/stylus">
   @import "../../common/stylus/mixins.styl"
   .shop_container
+    overflow hidden
     margin-bottom 50px
     .shop_list
       .shop_li
